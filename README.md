@@ -10,7 +10,7 @@ This toolkit is for **authorized use only**: the OffSec OSCP exam and PEN-200 la
 
 Every tool it stages is publicly available and used against isolated, authorized targets. Do not point any of it at systems you do not own or are not contracted to test.
 
-It also ships an `EXAM-RESTRICTED-TOOLS.txt` reminder of OffSec's exam rules (see "Exam compliance" below).
+It also ships an `EXAM-RESTRICTED-TOOLS.txt` reminder of OffSec's exam rules.
 
 ## What it stages
 
