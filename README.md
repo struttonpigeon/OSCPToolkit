@@ -4,6 +4,9 @@ This is a bash script (`oscp-toolkit-setup-v6.5.sh`) that stages a complete, off
 
 It downloads, extracts, and organizes the standard publicly available offensive-security tools, pre-generates reverse-shell payloads, and writes cheatsheet/method templates, so that during a time-boxed exam you are transferring known-good binaries to targets instead of hunting for them.
 
+Edit 23 Sep 26: https://github.com/struttonpigeon/Windows-exploit-suggester
+I posted a new windows scanner tool that might help.
+
 ## Intended use
 
 This toolkit is for **authorized use only**: the OffSec OSCP exam and PEN-200 lab environment, your own practice labs (Proving Grounds, HackTheBox, personal VMs), or engagements where you have explicit written permission. 
