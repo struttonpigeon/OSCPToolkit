@@ -1,0 +1,26 @@
+name: shell-lint
+
+on:
+  push:
+    paths:
+      - '**/*.sh'
+      - '.github/workflows/shell-lint.yml'
+  pull_request:
+    paths:
+      - '**/*.sh'
+      - '.github/workflows/shell-lint.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bash syntax
+        run: bash -n oscp-toolkit-setup-v7.0.sh
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
