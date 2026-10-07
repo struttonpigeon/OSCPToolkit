@@ -1,6 +1,6 @@
 # OSCP Toolkit Setup
 
-This is a bash script (`oscp-toolkit-setup-v6.5.sh`) that stages a complete, offline privilege-escalation and post-exploitation toolkit on a Kali attacker box for **OSCP / PEN-200 exam preparation and the exam itself**.
+This is a bash script (`oscp-toolkit-setup-v7.0.sh`) that stages a complete, offline privilege-escalation and post-exploitation toolkit on a Kali attacker box for **OSCP / PEN-200 exam preparation and the exam itself**.
 
 It downloads, extracts, and organizes the standard publicly available offensive-security tools, pre-generates reverse-shell payloads, and writes cheatsheet/method templates, so that during a time-boxed exam you are transferring known-good binaries to targets instead of hunting for them.
 
@@ -14,6 +14,12 @@ This toolkit is for **authorized use only**: the OffSec OSCP exam and PEN-200 la
 Every tool it stages is publicly available and used against isolated, authorized targets. Do not point any of it at systems you do not own or are not contracted to test.
 
 It also ships an `EXAM-RESTRICTED-TOOLS.txt` reminder of OffSec's exam rules.
+
+## v7 hardening
+
+v7 adds safer archive extraction, a provenance ledger (`SOURCES.tsv`), pipx-first Python tooling, exact Chisel ZIP member selection, a post-stage `attacker/toolkit-doctor.sh`, deterministic hashing, and a fix for the CopyFail prerequisite checker's inverted exit status. The bundled `dfold.tar.gz` is staged as a legacy artifact but is not auto-extracted or executed.
+
+See `TOOL_REVIEW_2026-10-07.md` for the per-tool review and prioritization.
 
 ## What it stages
 
@@ -53,13 +59,13 @@ Impacket is expected to come from the Kali `python3-impacket` package rather tha
 
 ```bash
 # 1. Make it executable
-chmod +x oscp-toolkit-setup-v6.5.sh
+chmod +x oscp-toolkit-setup-v7.0.sh
 
 # 1.5 Execute without parameters
-./oscp-toolkit-setup-v6.5.sh
+./oscp-toolkit-setup-v7.0.sh
 
 # 2. Pass your VPN tun0 IP (LHOST) and preferred callback port (LPORT)
-./oscp-toolkit-setup-v6.5.sh 192.168.45.200 443
+./oscp-toolkit-setup-v7.0.sh 192.168.45.200 443
 ```
 
 `LHOST` and `LPORT` are positional arguments. `LHOST` seeds the pre-generated payloads and the cheatsheets; if you leave it as the default `CHANGEME`, payload generation is skipped so you never bake in a wrong address.
@@ -80,10 +86,10 @@ The ip address and port should feed the pre-generated shell payloads and cheatsh
 Environment variables let you change the destination and pinned versions without editing the script:
 
 ```bash
-TOOLKIT=~/exam-kit CHISEL_VER=1.11.7 LIGOLO_VER=0.8.3 ./oscp-toolkit-setup-v6.5.sh 192.168.45.200 443
+TOOLKIT=~/exam-kit CHISEL_VER=1.12.0 LIGOLO_VER=0.9.2 ./oscp-toolkit-setup-v7.0.sh 192.168.45.200 443
 ```
 
-Default toolkit directory is `~/privesc-toolkit`. Current pinned versions are chisel 1.11.7 and ligolo-ng 0.8.3.
+Default toolkit directory is `~/privesc-toolkit`. Current pinned versions are chisel 1.12.0 and ligolo-ng 0.9.2.
 
 ## Serving tools to targets
 
