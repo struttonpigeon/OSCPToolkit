@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  OSCP+ Toolkit Downloader v6.4 — BloodHound Docker Package                           ║
+# ║  OSCP+ Toolkit Downloader v6.5 — BloodHound Docker Package                           ║
 # ║  Run this on your Kali attacker box BEFORE the exam.                       ║
 # ║  Goal: pre-stage initial-access triage and post-shell tools.       ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -1230,7 +1230,7 @@ EOF
 preflight
 
 echo "============================================================"
-echo "[*] OSCP+ Toolkit Setup v6.4"
+echo "[*] OSCP+ Toolkit Setup v6.5"
 echo "[*] Target: $TOOLKIT"
 echo "[*] LHOST=$LHOST  LPORT=$LPORT"
 echo "============================================================"
